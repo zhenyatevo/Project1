@@ -50,9 +50,11 @@ pair<int, pair<string, string>> Lexer::tick() { //fsm
 		case '\n':  // \n like ïðîáåë
 			return { 0, LEX_EMPTY };
 		case 3:  // EOF
-			exit(0);
+			
+			return { 0, LEX_EOF };
+			//exit(0); - так тоже здесь не нужно
 		case 4:  // error
-			throw string("invlid syntax!");
+			return{ 0, {LEX_ERROR} };
 		case '(':  // to state 1 - (){},.;*>
 			return { 0, {"lpar", ""} };
 		case ')':
@@ -139,18 +141,19 @@ pair<int, pair<string, string>> Lexer::tick() { //fsm
 			return{ 0, {"opor", ""} };
 		}
 		else {
-			throw string("invlid syntax!");
+			return{ 0, {LEX_ERROR} };
 		}
 	case 12:
 		if (current_char == '&') {//13
 			return{ 0, {"opand", ""} };
 		}
 		else {
-			throw string("invlid syntax!");
+			return{ 0, {LEX_ERROR} };
 		}
 	case 14:
 		if (current_char == '\'') {    //  char 
-			throw string("invlid syntax!");
+			//throw string("invlid syntax!"); - такие ошибки для тестов не нужны
+			return{ 0, {LEX_ERROR} };
 		}
 		else if (current_char == '\\') {
 			buffer += current_char;
@@ -172,7 +175,7 @@ pair<int, pair<string, string>> Lexer::tick() { //fsm
 			}
 		}
 		else {
-			throw string("invlid syntax!");
+			return{ 0, {LEX_ERROR} };
 		}
 	case 150:
 		if (current_char == '\'') {
@@ -181,7 +184,7 @@ pair<int, pair<string, string>> Lexer::tick() { //fsm
 			return{ 0, {"char", val} };
 		}
 		else {
-			throw string("invlid syntax!");
+			return{ 0, {LEX_ERROR} };
 		}
 
 	case 16:
@@ -191,7 +194,7 @@ pair<int, pair<string, string>> Lexer::tick() { //fsm
 			return{ 0, {"char", val} };
 		}
 		else {
-			throw string("invlid syntax!");
+			return{ 0, {LEX_ERROR} };
 		}
 	case 18:
 		if (current_char == '\"') {
@@ -207,6 +210,9 @@ pair<int, pair<string, string>> Lexer::tick() { //fsm
 			buffer = "";
 			return{ 0, {"str", val} };
 		}
+		else if (current_char == '\x3') { // LEX_ERROR okay, but EOF - not okay!
+			return { 0, LEX_ERROR };
+		}
 		else {
 			buffer += current_char;
 			return{ 20, {LEX_EMPTY} };
@@ -217,7 +223,8 @@ pair<int, pair<string, string>> Lexer::tick() { //fsm
 			if (kw.count(buffer)) {
 				val = buffer;
 				buffer = current_char;
-				return{ 0, {"keyword", kw[val]} };
+				return{ 0, {kw[val], ""}};
+				
 			}
 			else {
 				val = buffer;
