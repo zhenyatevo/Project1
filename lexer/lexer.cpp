@@ -67,7 +67,7 @@ pair<int, pair<string, string>> Lexer::tick() { //fsm
 			return { 0, {"semicolon", ""} };
 		case ',':
 			return { 0, {"comma", ""} };
-		case '.':
+		case ':':
 			return { 0, {"colon", ""} };
 		case '>':
 			return { 0, {"opgt", ""} };
