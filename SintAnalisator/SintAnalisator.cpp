@@ -1,4 +1,4 @@
-﻿// SintAnalisator.cpp : Определяет функции для статической библиотеки.
+// SintAnalisator.cpp : Определяет функции для статической библиотеки.
 //
 
 // заголовочные файлы самого SintAn
@@ -454,8 +454,8 @@ bool  SintAn::DeclareStmt_1(){
 			
 			return true;
 		}
-		else{          // !!! тут я не уверена в том как расписала
-			if (!DeclVarList_1()) return false;
+	else{          // !!! тут я не уверена в том как расписала - ВСЁ ОКК
+		if (!DeclVarList_1()) return false;
 			return true;
 			if (token.first == "semicolon") {    // ;
 				return true;
@@ -512,10 +512,13 @@ bool  SintAn::InitVar(){ // вроде бы так правильно
 	}
 }
 
-bool  SintAn::ParamList(){ // как тут быть с  Эпсилон?
-	if (!Type()) return false;
-	
-
+bool  SintAn::ParamList(){ // вот так работает!!
+	if (Type()) {
+		if (token.first == "id") { // id
+			if (!ParamList_1()) return false;
+			return true;
+		}
+	} 
 	else { // ЭПСИЛОН 
 		return true;
 	}
