@@ -37,6 +37,8 @@ public:
 	bool E2(vector<int>& ne_nashi_deti);
 	bool E1(vector<int>& ne_nashi_deti);
 	bool E1_1(vector<int>& ne_nashi_deti);
+	bool ArgList(vector<int>& ne_nashi_deti);
+	bool ArgList_1(vector<int>& ne_nashi_deti);
 
 
 

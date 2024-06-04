@@ -23,6 +23,8 @@ using namespace std;
 SintAn::SintAn(istream& stream) :lexer{ stream }
 {
 	token = lexer.get_NextLexem();
+	cout << token.first << " " << token.second << endl;
+	//не распознал полностью, только часть и все равно ОК
 }
 
 void SintAn::TreePainter(vector<int>& ne_nashi_deti) {
@@ -65,6 +67,12 @@ bool SintAn::E(vector<int> & ne_nashi_deti) {
 
 	if (!E7(ne_nashi_deti)) return false;
 	ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
+	pair<string, string>p = lexer.get_NextLexem();
+	cout << p.first << " " << p.second << endl;
+	if (lexer.get_NextLexem() != LEX_EOF) {
+		return false;
+
+	}
 	return true;
 }
 
@@ -343,6 +351,7 @@ bool SintAn::E2(vector<int>& ne_nashi_deti) {
 
 bool SintAn::E1(vector<int>& ne_nashi_deti) {  
 	TreePainter(ne_nashi_deti); //печать
+	cout << "E1 ";
 
 	if (token.first == "opinc") { // ++
 		cout << "opinc "; // Вывод имени ф-ции
@@ -382,7 +391,7 @@ bool SintAn::E1(vector<int>& ne_nashi_deti) {
 		return true;
 	}
 	else if (token.first == "id") { // id
-		cout << "id(" << token.second << ") ";
+		cout << "id(" << token.second << ") " << endl;
 		token = lexer.get_NextLexem(); // получаем следующий токен
 		ne_nashi_deti.push_back(0); //иду вглубь по листьям
 		
@@ -390,6 +399,7 @@ bool SintAn::E1(vector<int>& ne_nashi_deti) {
 		ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
 		return true;
 	}
+	
 }
 
 
@@ -406,10 +416,79 @@ bool SintAn::E1_1(vector<int>& ne_nashi_deti) {
 		token = lexer.get_NextLexem(); // получаем следующий токен
 		return true;
 	}
+	else if (token.first == "lpar") { // (
+		cout << "lpar" << endl;
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		ne_nashi_deti.push_back(1); //иду вглубь по листьям
+
+		if (!ArgList(ne_nashi_deti)) return false;
+		//token = lexer.get_NextLexem(); // получаем следующий токен
+		ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
+
+		if (token.first == "rpar") { // )
+			ne_nashi_deti.push_back(0);
+			TreePainter(ne_nashi_deti); //печать
+			cout << "rpar" << endl;
+			ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
+
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 	else { // ЭПСИЛОН 
 		return true;
 	}
 }
+
+bool SintAn::ArgList(vector<int>& ne_nashi_deti) {
+	TreePainter(ne_nashi_deti); //печать
+	cout << "ArgList" << endl; // Вывод имени ф-ции
+
+	ne_nashi_deti.push_back(1); //иду вглубь по листьям(не последний лист)
+
+	if (!E(ne_nashi_deti)) {
+		ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
+		return true;
+		
+	}
+	else {
+		ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
+		ne_nashi_deti.push_back(0); //иду вглубь по листьям
+
+		if (!ArgList_1(ne_nashi_deti)) return false;
+		ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
+		return true;
+
+	}
+	
+}
+bool SintAn::ArgList_1(vector<int>& ne_nashi_deti) {
+	TreePainter(ne_nashi_deti); //печать
+
+	if (token.first == "comma") { // ,
+		cout << "ArgList_1" << endl; // Вывод имени ф-ции
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		ne_nashi_deti.push_back(1); //иду вглубь по листьям(не последний лист)
+
+		if (!E(ne_nashi_deti)) return false;
+		ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
+		ne_nashi_deti.push_back(0); //иду вглубь по листьям
+
+		if (!ArgList_1(ne_nashi_deti)) return false;
+		ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
+		return true;
+	}
+	else { // ЭПСИЛОН 
+		cout << "ArgList_1" << endl; // Вывод имени ф-ции
+		return true;
+	}
+}
+
+
 
 // ОСТАЛЬНАЯ ГРАМАТИКА
 bool  SintAn::DeclareStmt(){
