@@ -43,32 +43,32 @@ public:
 
 
 
-	bool DeclareStmt();
-	bool DeclareStmt_1();
-	bool Type();
-	bool DeclVarList_1();
-	bool InitVar();
-	bool ParamList();
-	bool ParamList_1();
-	bool StmtList();
-	bool Stmt();
-	bool AssignOrCallOp();
-	bool AssignOrCall();
-	bool AssignOrCall_1();
-	bool WhileOp();
-	bool ForOp();
-	bool ForInit();
-	bool ForExp();
-	bool ForLoop();
-	bool IfOp();
-	bool ElsePart();
-	bool SwitchOp();
-	bool Cases();
-	bool Cases_1();
-	bool ACase();
-	bool IOp();
-	bool OOp();
-	bool OOp_1();
+	bool DeclareStmt(vector<int>& ne_nashi_deti);
+	bool DeclareStmt_1(vector<int>& ne_nashi_deti);
+	bool Type(vector<int>& ne_nashi_deti);
+	bool DeclVarList_1(vector<int>& ne_nashi_deti);
+	bool InitVar(vector<int>& ne_nashi_deti);
+	bool ParamList(vector<int>& ne_nashi_deti);
+	bool ParamList_1(vector<int>& ne_nashi_deti);
+	bool StmtList(vector<int>& ne_nashi_deti);
+	bool Stmt(vector<int>& ne_nashi_deti);
+	bool AssignOrCallOp(vector<int>& ne_nashi_deti);
+	bool AssignOrCall(vector<int>& ne_nashi_deti);
+	bool AssignOrCall_1(vector<int>& ne_nashi_deti);
+	bool WhileOp(vector<int>& ne_nashi_deti);
+	bool ForOp(vector<int>& ne_nashi_deti);
+	bool ForInit(vector<int>& ne_nashi_deti);
+	bool ForExp(vector<int>& ne_nashi_deti);
+	bool ForLoop(vector<int>& ne_nashi_deti);
+	bool IfOp(vector<int>& ne_nashi_deti);
+	bool ElsePart(vector<int>& ne_nashi_deti);
+	bool SwitchOp(vector<int>& ne_nashi_deti);
+	bool Cases(vector<int>& ne_nashi_deti);
+	bool Cases_1(vector<int>& ne_nashi_deti);
+	bool ACase(vector<int>& ne_nashi_deti);
+	bool IOp(vector<int>& ne_nashi_deti);
+	bool OOp(vector<int>& ne_nashi_deti);
+	bool OOp_1(vector<int>& ne_nashi_deti);
 
 };
 

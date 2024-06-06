@@ -10,7 +10,7 @@ int main() {
 	in.open("prog.txt");
 	SintAn sintan(in); //
 	vector<int> deti;
-	if (sintan.E(deti)) {
+	if (sintan.StmtList(deti)) {
 		cout << "ОК";
 	}
 	else {

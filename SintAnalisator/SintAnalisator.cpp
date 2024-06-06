@@ -23,8 +23,8 @@ using namespace std;
 SintAn::SintAn(istream& stream) :lexer{ stream }
 {
 	token = lexer.get_NextLexem();
-	cout << token.first << " " << token.second << endl;
-	//не распознал полностью, только часть и все равно ОК
+	
+
 }
 
 void SintAn::TreePainter(vector<int>& ne_nashi_deti) {
@@ -67,9 +67,8 @@ bool SintAn::E(vector<int> & ne_nashi_deti) {
 
 	if (!E7(ne_nashi_deti)) return false;
 	ne_nashi_deti.pop_back(); //затираю значения, когда выхожу из листьев
-	pair<string, string>p = lexer.get_NextLexem();
-	cout << p.first << " " << p.second << endl;
-	if (lexer.get_NextLexem() != LEX_EOF) {
+	//pair<string, string>p = lexer.get_NextLexem();
+	if (token != LEX_EOF) {
 		return false;
 
 	}
@@ -405,7 +404,7 @@ bool SintAn::E1(vector<int>& ne_nashi_deti) {
 
 bool SintAn::E1_1(vector<int>& ne_nashi_deti) {
 	TreePainter(ne_nashi_deti); //печать
-	cout << "E1_1" << endl;
+	cout << "E1_1 ";
 
 	if (token.first == "opinc") { // ++
 		ne_nashi_deti.push_back(0); //иду вглубь по листьям
@@ -435,10 +434,12 @@ bool SintAn::E1_1(vector<int>& ne_nashi_deti) {
 			return true;
 		}
 		else {
+			
 			return false;
 		}
 	}
 	else { // ЭПСИЛОН 
+		cout << endl;
 		return true;
 	}
 }
@@ -491,99 +492,148 @@ bool SintAn::ArgList_1(vector<int>& ne_nashi_deti) {
 
 
 // ОСТАЛЬНАЯ ГРАМАТИКА
-bool  SintAn::DeclareStmt(){
-	if (!Type()) return false;
+bool  SintAn::DeclareStmt(vector<int>& ne_nashi_deti){
+
+	if (!Type(ne_nashi_deti)) return false;
 	
 	if (token.first == "id") { // id
-		if (!DeclareStmt_1()) return false;
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!DeclareStmt_1(ne_nashi_deti)) return false;
 		return true;
 	}
 }
 
 
-bool  SintAn::DeclareStmt_1(){
-	if (token.first == "lpar") { // (
+bool  SintAn::DeclareStmt_1(vector<int>& ne_nashi_deti){
 
-		if (!ParamList()) return false;
+	if (token.first == "lpar") { // (
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!ParamList(ne_nashi_deti)) return false;
 		return true;
 
 		if (token.first == "rpar") { // )
+			token = lexer.get_NextLexem(); // получаем следующий токен
 
 			if (token.first == "lbrace") { // {
+				token = lexer.get_NextLexem(); // получаем следующий токен
 
-				if (!StmtList()) return false;
+				if (!StmtList(ne_nashi_deti)) return false;
 				return true;
 				
 				if (token.first == "rbrace") { // }
+					token = lexer.get_NextLexem(); // получаем следующий токен
 					return true;
+				}
+				else {
+					return false;
 				}
 				return true;
 			}
+			else {
+				return false;
+			}
 			return true;
 		}
-		return true;
+		else {
+			return false;
+		}
+		
 	}
 	else if (token.first == "opassign") {  // =
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
 		if (token.first == "num") {        // num
-			if (!DeclVarList_1()) return false;
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (!DeclVarList_1(ne_nashi_deti)) return false;
 			return true;
+
 			if (token.first == "semicolon") {    // ;
+				token = lexer.get_NextLexem(); // получаем следующий токен
 				return true;
 			}
-			
-			return true;
-		}
-	else{          // !!! тут я не уверена в том как расписала - ВСЁ ОКК
-		if (!DeclVarList_1()) return false;
-			return true;
-			if (token.first == "semicolon") {    // ;
-				return true;
+			else {
+				return false;
 			}
 			return true;
 		}
+		else {
+			return false;
+		}
+	}
+	else{          
+		if (!DeclVarList_1(ne_nashi_deti)) return false;
+			return true;
+
+			if (token.first == "semicolon") {    // ;
+				token = lexer.get_NextLexem(); // получаем следующий токен
+				return true;
+			}
+			else {
+				return false;
+			}	
+	}	
+}
+
+
+
+bool  SintAn::Type(vector<int>& ne_nashi_deti){
+
+	
+	if (token.first == "kwchar") {
+		token = lexer.get_NextLexem(); // получаем следующий токен
 		return true;
+	}
+	else if (token.first == "kwint") {
+		token = lexer.get_NextLexem(); // получаем следующий токен
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 
 
-bool  SintAn::Type(){
-	if (token.first == "char") {
-		return true;
-	}
-	else if (token.first == "int") {
-		return true;
-	}
-}
+bool  SintAn::DeclVarList_1(vector<int>& ne_nashi_deti){
 
-
-bool  SintAn::DeclVarList_1(){ 
 	if (token.first == "comma"){   // ,
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
 		if (token.first == "id") { // id
-			if (!InitVar()) return false;
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (!InitVar(ne_nashi_deti)) return false;
 			return true;
-			if (!DeclVarList_1()) return false;
-			return true;
-			if (token.first == "semicolon") {    // ;
-				return true;
-			}
+			if (!DeclVarList_1(ne_nashi_deti)) return false;
 			return true;
 		}
-		return true;	
+		else {
+			return false;
+		}	
 	}
 	else { // ЭПСИЛОН 
 		return true;
 	}
-	
 }
 
 
-bool  SintAn::InitVar(){ // вроде бы так правильно
+bool  SintAn::InitVar(vector<int>& ne_nashi_deti){ // вроде бы так правильно
+
 	if (token.first == "opassign") {     // =
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
 		if (token.first == "num") {     // num
+			token = lexer.get_NextLexem(); // получаем следующий токен
 			return true;
 		}
 		else if (token.first == "char") { // char
+			token = lexer.get_NextLexem(); // получаем следующий токен
 			return true;
+		}
+		else {
+			return false;
 		}
 	}
 	else { // ЭПСИЛОН 
@@ -591,29 +641,43 @@ bool  SintAn::InitVar(){ // вроде бы так правильно
 	}
 }
 
-bool  SintAn::ParamList(){ // вот так работает!!
-	if (Type()) {
+
+bool  SintAn::ParamList(vector<int>& ne_nashi_deti){ // вот так работает!!
+
+	if (Type(ne_nashi_deti)) {
+
 		if (token.first == "id") { // id
-			if (!ParamList_1()) return false;
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (!ParamList_1(ne_nashi_deti)) return false;
 			return true;
+		}
+		else {
+			return false;
 		}
 	} 
 	else { // ЭПСИЛОН 
 		return true;
 	}
-
 }
 
 
-bool  SintAn::ParamList_1(){
-	if (token.first == "comma") {   // ,
+bool  SintAn::ParamList_1(vector<int>& ne_nashi_deti){
 
-		if (!Type()) return false;
+	if (token.first == "comma") {   // ,
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!Type(ne_nashi_deti)) return false;
 		return true;
 
 		if (token.first == "id") {  // id
-			if (!ParamList_1()) return false;
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (!ParamList_1(ne_nashi_deti)) return false;
 			return true;
+		}
+		else {
+			return false;
 		}
 		
 	}
@@ -624,63 +688,513 @@ bool  SintAn::ParamList_1(){
 }
 
 
-bool  SintAn::StmtList(){ return true; } //?????
-bool  SintAn::Stmt(){ return true; }
-bool  SintAn::AssignOrCallOp(){ return true; }
-bool  SintAn::AssignOrCall(){ return true; }
-bool  SintAn::AssignOrCall_1(){ return true; }
-bool  SintAn::WhileOp(){ return true; }
-bool  SintAn::ForOp(){ return true; }
-bool  SintAn::ForInit(){ return true; }
-bool  SintAn::ForExp(){
-	return true;
+bool  SintAn::StmtList(vector<int>& ne_nashi_deti){
+	if (Stmt(ne_nashi_deti)) {
+		if (StmtList(ne_nashi_deti)) return true;
+		return false;
+	}
+	else if (token == LEX_EOF) {
+		
+		return true;
+	}
+	else {
+		return false;
+	}
+	
+} 
+
+
+bool  SintAn::Stmt(vector<int>& ne_nashi_deti){
+
+	if (token.first == "semicolon") { //  ;
+		token = lexer.get_NextLexem(); // получаем следующий токен
+		return true;
+	}
+	else if (token.first == "lbrace") { // {
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!Stmt(ne_nashi_deti)) return false;
+		return true;
+
+		if (token.first == "rbrace") { // }
+			token = lexer.get_NextLexem(); // получаем следующий токен
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (token.first == "kwreturn") { // return
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!E(ne_nashi_deti)) return false;
+		return true;
+
+		if (token.first == "semicolon") { //  ;
+			token = lexer.get_NextLexem(); // получаем следующий токен
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else if (DeclareStmt(ne_nashi_deti)) {
+		return true;
+	}
+	else if (AssignOrCallOp(ne_nashi_deti)) {
+		return true;
+	}
+	else if (WhileOp(ne_nashi_deti)) {
+		return true;
+	}
+	else if (ForOp(ne_nashi_deti)) {
+		return true;
+	}
+	else if (IfOp(ne_nashi_deti)) {
+		return true;
+	}
+	else if (SwitchOp(ne_nashi_deti)) {
+		return true;
+	}
+	else if (IOp(ne_nashi_deti)) {
+		return true;
+	}
+	else if (OOp(ne_nashi_deti)) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
-bool  SintAn::ForLoop(){ return true; }
-bool  SintAn::IfOp(){ return true; }
-bool  SintAn::ElsePart(){ return true; }
-bool  SintAn::SwitchOp(){ return true; }
-bool  SintAn::Cases(){ return true; }
-bool  SintAn::Cases_1(){ return true; }
-bool  SintAn::ACase(){ 
-	return true; 
-}
 
 
-bool  SintAn::IOp(){ 
-	if (token.first == "in") {
+bool  SintAn::AssignOrCallOp(vector<int>& ne_nashi_deti){
 
-		if (token.first == "id") {
+	if (token.first == "id") {  // id
+		token = lexer.get_NextLexem(); // получаем следующий токен
 
-			if (token.first == "semicolon") {
+		if (AssignOrCall(ne_nashi_deti)) {
+			return true;
+
+			if (token.first == "semicolon") { //  ;
+				token = lexer.get_NextLexem(); // получаем следующий токен
 				return true;
 			}
-			return true;
+			else {
+				return false;
+			}
 		}
-		return true;
-	} 
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
 }
 
 
-bool  SintAn::OOp(){ 
-	if (token.first == "out") {
+bool  SintAn::AssignOrCall(vector<int>& ne_nashi_deti){
 
-		if (!OOp_1()) return false;
+	if (token.first == "id") {  // id
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!AssignOrCall_1(ne_nashi_deti)) return false;
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
+bool  SintAn::AssignOrCall_1(vector<int>& ne_nashi_deti){
+	
+	if (token.first == "lpar") { // (
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!ArgList(ne_nashi_deti)) return false;
 		return true;
 
-		if (token.first == "semicolon") {
+		if (token.first == "rpar") { // )
+			token = lexer.get_NextLexem(); // получаем следующий токен
 			return true;
 		}
+		else {
+			return false;
+		}
+	}
+	else if (E(ne_nashi_deti)) {
+		return true;
+	}
+	else {
+		return false;
+	}
+	
+}
+
+
+bool  SintAn::WhileOp(vector<int>& ne_nashi_deti){ // "while", "kwwhile"
+
+	if (token.first == "kwwhile") { //  while
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (token.first == "lpar") { // (
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (!E(ne_nashi_deti)) return false;
+			return true;
+
+			if (token.first == "rpar") { // )
+				token = lexer.get_NextLexem(); // получаем следующий токен
+				return true;
+
+				if (!Stmt(ne_nashi_deti)) return false;
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
+
+bool  SintAn::ForOp(vector<int>& ne_nashi_deti){
+
+	if (token.first == "kwfor") { //  {"for", "kwfor"}
+		token = lexer.get_NextLexem(); // получаем следующий токен
+		
+		if (token.first == "lpar") { // (
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (!ForInit(ne_nashi_deti)) return false; // ForInit()
+			return true;
+
+			if (token.first == "semicolon") { //  ;
+				token = lexer.get_NextLexem(); // получаем следующий токен
+				return true;
+
+				if (!ForExp(ne_nashi_deti)) return false; // ForExp()
+				return true;
+
+				if (token.first == "semicolon") { //  ;
+					token = lexer.get_NextLexem(); // получаем следующий токен
+					return true;
+
+					if (!ForLoop(ne_nashi_deti)) return false; // ForLoop()
+					return true;
+
+					if (token.first == "rpar") { // )
+						token = lexer.get_NextLexem(); // получаем следующий токен
+						return true;
+
+						if (!Stmt(ne_nashi_deti)) return false; // Stmt()
+						return true;
+					}
+					else {
+						return false;
+					}
+				}
+				else {
+					return false;
+				}
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
+
+bool  SintAn::ForInit(vector<int>& ne_nashi_deti){
+
+	
+	if (token.first == "id") {  // id
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!AssignOrCall(ne_nashi_deti)) return false;
+		return true;
+	}
+	else { //Epsilon
 		return true;
 	}
 }
 
 
-bool  SintAn::OOp_1(){  ///??????
-	//if (!E(ne_nashi_deti)) return false;
+bool  SintAn::ForExp(vector<int>& ne_nashi_deti){
+	// E() | epsilon  ????? - тут нужно просто поверить :)
+	// т. к. только больные ублюдки не пишут условие цикла
+	if (!E(ne_nashi_deti)) return false;
 	return true;
-	
-	if (token.first == "str"){
+}
+
+
+bool  SintAn::ForLoop(vector<int>& ne_nashi_deti){
+	// AssignOrCall() | ++ id | epsilon  ?????
+
+	if (token.first == "id") {  // id
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!AssignOrCall(ne_nashi_deti)) return false;
 		return true;
+	}
+	else if (token.first == "opinc") { // ++
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (token.first == "id") { // id
+			token = lexer.get_NextLexem(); // получаем следующий токен
+		}
+		else {
+			return false;
+		}
+	}
+	else { //Epsilon
+		return true;
+	}
+}
+bool  SintAn::IfOp(vector<int>& ne_nashi_deti){
+
+	if (token.first == "kwif") {  // {"if", "kwif"}
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (token.first == "lpar") { // (
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (!E(ne_nashi_deti)) return false;
+			return true;
+
+			if (token.first == "rpar") { // )
+				token = lexer.get_NextLexem(); // получаем следующий токен
+
+				if (!Stmt(ne_nashi_deti)) return false;
+				return true;
+
+				if (!ElsePart(ne_nashi_deti)) return false;
+				return true;
+			}
+			else {
+				return false;
+			}	
+		}
+		else {
+			return false;
+		}
+	}
+	else { return false;
+	}
+}
+
+
+bool  SintAn::ElsePart(vector<int>& ne_nashi_deti){
+
+	if (token.first == "kwelse") { //  {"else", "kwelse"}
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!Stmt(ne_nashi_deti)) return false;
+		return true;
+	}
+	else { //эпсилон
+		return true;
+	}
+}
+
+
+bool  SintAn::SwitchOp(vector<int>& ne_nashi_deti){
+
+	if (token.first == "switch") { // { "switch", "kwswitch"}
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (token.first == "lpar") { // (
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (!E(ne_nashi_deti)) return false;  // E()
+			return true;
+
+			if (token.first == "rpar") { // ) 
+				token = lexer.get_NextLexem(); // получаем следующий токен
+
+				if (token.first == "lbrace") { // {
+					token = lexer.get_NextLexem(); // получаем следующий токен
+
+					if (!Cases(ne_nashi_deti)) return false; // Cases()
+					return true;
+
+					if (token.first == "rbrace") { // }
+						token = lexer.get_NextLexem(); // получаем следующий токен
+						return true;
+					}
+					else {
+						return false;
+					}
+				}
+				else {
+					return false;
+				}
+			}
+			else {
+				return false;
+			}	
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
+
+bool  SintAn::Cases(vector<int>& ne_nashi_deti){
+	
+	if (token.first == "kwcase") {  // {"case", "kwcase"}
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (ACase(ne_nashi_deti)) {
+			return true;
+			if (Cases_1(ne_nashi_deti)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
+
+bool  SintAn::Cases_1(vector<int>& ne_nashi_deti){
+	
+	if (token.first == "kwcase") {  // {"case", "kwcase"}
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (ACase(ne_nashi_deti)) {
+			return true;
+			if (Cases_1(ne_nashi_deti)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	else { //эпсилон
+		return true;
+	}
+}
+
+
+bool  SintAn::ACase(vector<int>& ne_nashi_deti){
+
+	if (token.first == "kwcase") {  // {"case", "kwcase"}        case
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (token.first == "num") {  // return{ 0, {"num", val} }    num
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (token.first == "colon") { // { 0, {"colon", ""}       :
+				token = lexer.get_NextLexem(); // получаем следующий токен
+
+				if (!Stmt(ne_nashi_deti)) return false;  // Stmt()
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+
+}
+
+
+bool  SintAn::IOp(vector<int>& ne_nashi_deti){
+
+	if (token.first == "in") {
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (token.first == "id") {
+			token = lexer.get_NextLexem(); // получаем следующий токен
+
+			if (token.first == "semicolon") {
+				token = lexer.get_NextLexem(); // получаем следующий токен
+				return true;
+			}
+			else {
+				false;
+			}
+		}
+		else {
+			false;
+		}
+	} 
+	else {
+		return false;
+	}
+}
+
+
+bool  SintAn::OOp(vector<int>& ne_nashi_deti){
+
+	if (token.first == "out") {
+		token = lexer.get_NextLexem(); // получаем следующий токен
+
+		if (!OOp_1(ne_nashi_deti)) return false;
+		return true;
+
+		if (token.first == "semicolon") {
+			token = lexer.get_NextLexem(); // получаем следующий токен
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
+
+bool  SintAn::OOp_1(vector<int>& ne_nashi_deti){
+
+	if (token.first == "str") {
+		token = lexer.get_NextLexem(); // получаем следующий токен
+		return true;
+	}
+	else if (E(ne_nashi_deti)) {
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 
